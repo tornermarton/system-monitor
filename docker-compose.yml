@@ -1,0 +1,14 @@
+version: "3.6"
+
+services:
+  system-monitor:
+    build: .
+    runtime: nvidia
+    image: tornermarton/system-monitor
+    container_name: system-monitor
+    tty: true
+    restart: unless-stopped
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    ports:
+      - "3000:3000"

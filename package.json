@@ -1,8 +1,8 @@
 {
   "name": "system-monitor",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "A simple microservice which provides htop-like information via REST API and server sent events",
+  "author": "Márton Torner",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -26,7 +26,8 @@
     "@nestjs/platform-express": "^8.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "systeminformation": "^5.9.17"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
