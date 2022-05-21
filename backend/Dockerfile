@@ -1,5 +1,5 @@
 ### STAGE 1: Build ###
-FROM node:16.3-alpine as development
+FROM node:alpine as build
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build
 
 ### STAGE 2: Run ###
-FROM nvidia/cuda:11.4.0-base-ubuntu20.04 as production
+FROM nvidia/cuda:11.4.0-base-ubuntu20.04 as deploy
 
 SHELL ["/bin/bash", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
@@ -24,5 +24,5 @@ ENV NODE_ENV=${NODE_ENV}
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --only=production
-COPY --from=development /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/dist ./dist
 CMD ["node", "dist/main"]

@@ -1,5 +1,5 @@
 import { Controller, Get, Sse } from '@nestjs/common';
-import { interval, map, Observable, of } from 'rxjs';
+import { interval, mergeMap, Observable, of } from 'rxjs';
 
 import { AppService } from './app.service';
 
@@ -14,6 +14,6 @@ export class AppController {
 
   @Sse('watch')
   watch(): Observable<any> {
-    return interval(1000).pipe(map(() => of(this.appService.getStats())));
+    return interval(1000).pipe(mergeMap(() => this.appService.getStats()));
   }
 }

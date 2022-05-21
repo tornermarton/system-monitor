@@ -1,5 +1,5 @@
 {
-  "name": "system-monitor",
+  "name": "system-monitor-backend",
   "version": "0.0.1",
   "description": "A simple microservice which provides htop-like information via REST API and server sent events",
   "author": "Márton Torner",
