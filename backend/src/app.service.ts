@@ -8,6 +8,8 @@ export class AppService {
       time: '*',
       system: '*',
       cpu: '*',
+      currentLoad: 'cpus',
+      mem: '*',
       memLayout: '*',
       graphics: 'controllers',
       networkInterfaces: '*',
@@ -15,13 +17,16 @@ export class AppService {
   }
 
   async getStats(): Promise<any> {
-    return await si.get({
-      time: '*',
-      cpu: '*',
-      mem: '*',
-      graphics: 'controllers',
-      networkStats: '*',
-      networkConnections: '*',
-    });
+    return {
+      data: await si.get({
+        time: '*',
+        cpu: '*',
+        currentLoad: 'cpus',
+        mem: '*',
+        graphics: 'controllers',
+        networkStats: '*',
+        networkConnections: '*',
+      }),
+    };
   }
 }

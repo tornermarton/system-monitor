@@ -1,14 +1,23 @@
-version: "3.6"
+version: "2.3"
 
 services:
-  system-monitor:
-    build: .
-    runtime: nvidia
-    image: tornermarton/system-monitor
-    container_name: system-monitor
+  backend:
+    build: ./backend
+    #runtime: nvidia
+    image: tornermarton/system-monitor-backend
+    container_name: system-monitor-backend
     tty: true
     restart: unless-stopped
     environment:
       - CUDA_VISIBLE_DEVICES=0
     ports:
       - "3000:3000"
+
+  frontend:
+    build: ./frontend
+    image: tornermarton/system-monitor-frontend
+    container_name: system-monitor-frontend
+    tty: true
+    restart: unless-stopped
+    ports:
+      - "80:80"
