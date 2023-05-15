@@ -2,9 +2,8 @@ version: "2.3"
 
 services:
   backend:
-    build: ./backend
-    #runtime: nvidia
-    image: tornermarton/system-monitor-backend
+    runtime: nvidia
+    image: tornermarton/system-monitor-backend:latest
     container_name: system-monitor-backend
     tty: true
     restart: unless-stopped
@@ -14,10 +13,11 @@ services:
       - "3000:3000"
 
   frontend:
-    build: ./frontend
-    image: tornermarton/system-monitor-frontend
+    image: tornermarton/system-monitor-frontend:latest
     container_name: system-monitor-frontend
     tty: true
     restart: unless-stopped
     ports:
       - "80:80"
+    volumes:
+      - "./config.json:/usr/share/nginx/html/assets/config.json"

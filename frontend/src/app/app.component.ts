@@ -1,5 +1,5 @@
 import {Component, NgZone} from '@angular/core';
-import {Observable} from 'rxjs';
+import {catchError, EMPTY, map, Observable, shareReplay, switchMap, take, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 
 @Component({
@@ -8,26 +8,61 @@ import {HttpClient} from '@angular/common/http';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  public info$: Observable<any> | null = null;
-  public watch$: Observable<any> | null = null;
+  public url$: Observable<URL>;
+  public info$: Observable<any>;
+  public watch$: Observable<any>;
 
   public year: number = new Date().getFullYear();
   public url: string = window.location.hostname;
 
-  public constructor(private http: HttpClient, private zone: NgZone) {
-    this.info$ = http.get(`http://${this.url}:3000/info`);
+  public infoLoading: boolean = true;
+  public infoError: Error | null = null;
+  public watchLoading: boolean = true;
+  public watchError: Error | null = null;
 
-    this.watch$ = new Observable<any>(subscriber => {
-      const source = new EventSource(`http://${this.url}:3000/watch`);
+  constructor(
+    private readonly http: HttpClient,
+    private readonly zone: NgZone,
+  ) {
+    this.url$ = this.http.get('assets/config.json').pipe(
+      map((config: any) => new URL(config['url'])),
+      shareReplay(1),
+    );
 
-      source.onmessage = event => {
-        this.zone.run(() => subscriber.next(JSON.parse(event.data)));
-      };
+    this.info$ = this.url$.pipe(
+      map((url) => new URL('info', url).href),
+      switchMap((url) => this.http.get(url)),
+      take(1),
+      tap(() => (this.infoLoading = false)),
+      catchError((error) => {
+        this.infoLoading = false;
+        this.infoError = error;
 
-      source.onerror = error => {
-        this.zone.run(() => subscriber.error(error));
-      };
-    });
+        return EMPTY;
+      }),
+    );
+
+    this.watch$ = this.url$.pipe(
+      map((url) => new URL('watch', url).href),
+      switchMap((url) => new Observable<any>(subscriber => {
+        const source = new EventSource(url);
+
+        source.onmessage = event => {
+          this.zone.run(() => subscriber.next(JSON.parse(event.data)));
+        };
+
+        source.onerror = error => {
+          this.zone.run(() => subscriber.error(error));
+        };
+      })),
+      tap(() => (this.watchLoading = false)),
+      catchError((error) => {
+        this.watchLoading = false;
+        this.watchError = error;
+
+        return EMPTY;
+      }),
+    );
   }
 
   public getUptime(n: number): {days: number, hours: number, minutes: number, seconds: number} {
